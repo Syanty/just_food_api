@@ -7,7 +7,8 @@ require("./config/db")
 const foodRoutes = require("./routes/food")
 const restaurantRoutes = require("./routes/restaurant")
 
-const searchController = require("./controllers/search")
+const searchController = require("./controllers/search");
+const { models } = require("mongoose");
 
 const app = express()
 
@@ -32,9 +33,14 @@ app.get("/", (req, res) => {
 
 const BASE_URI = process.env.BASE_URI
 
-app.get(`${BASE_URI}/search`,searchController.dynamicSearch)
+
+
+
+
+app.get(`${BASE_URI}/search`, searchController.dynamicSearch)
 app.use(`${BASE_URI}/foods/`, foodRoutes)
 app.use(`${BASE_URI}/restaurants/`, restaurantRoutes)
+
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
