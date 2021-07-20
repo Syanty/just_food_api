@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("../config/nodemailer")
 const User = require("../models/user");
 
 router.post("/signup/", async (req, res, next) => {
@@ -12,11 +13,18 @@ router.post("/signup/", async (req, res, next) => {
     if (!user) {
       return res.status(info.statusCode).send({ message: info.message })
     }
-
+    const token = jwt.sign({ email: user.email }, process.env.SECRET, {
+      expiresIn: "1h",
+    });
+    nodemailer.sendConfirmationEmail(
+      user.email,
+      token
+    )
     res.status(201).send({
       message: info.message,
-      user:user
+      user: user
     });
+   
   })(req, res, next);
 });
 
@@ -42,7 +50,7 @@ router.post("/login/", async (req, res, next) => {
           expiresIn: "1d",
         });
 
-        return res.json({ message: info.message, token: token });
+        res.json({ message: info.message, token: token });
       });
     } catch (error) {
       return next(error);

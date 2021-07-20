@@ -14,19 +14,20 @@ passport.use(
         },
         async (email, password, done) => {
             try {
-                await User.findOne({ email: email }).then(async ( userExist) => {
-                    if (userExist) {
-                        return done(null, false, { message: "Email is already taken.", statusCode: 400 });
-                    } else {
-                        const user = await User.create({
-                            email,
-                            password,
-                        });
-                        return done(null, user, { message: "User created successfully" });
-                    }
-                })
+                const userExist = await User.findOne({ email: email })
+                if (userExist) {
+                    return done(null, false, { message: "Email is already taken.", statusCode: 400 });
+                }
+
+
+                const user = await User.create({
+                    email,
+                    password,
+                });
+
+                return done(null, user, { message: "Verification link has been sent to the email. Please Verify it before logging in." });
             } catch (error) {
-                return done(error);
+                done(error);
             }
 
 
@@ -44,7 +45,11 @@ passport.use(
             try {
                 const user = await User.findOne({ email });
                 if (!user) {
-                    return done(null, false, { message: "User not found", statusCode: 404 });
+                    return done(null, false, { message: "Email is not registered", statusCode: 404 });
+                }
+
+                if (!user.email_verified) {
+                    return done(null, false, { message: "Please verify your email", statusCode: 400 });
                 }
 
                 const isValid = await user.isValidPassword(password);
