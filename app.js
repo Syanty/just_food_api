@@ -3,7 +3,10 @@ const morgan = require("morgan")
 const cors = require("cors");
 require("dotenv").config()
 require("./config/db")
-
+require("./auth/passport-auth");
+const authAccountRoutes = require("./routes/auth-account");
+const userRoutes = require("./routes/user");
+const errorHandler = require("./helpers/error-handler");
 const foodRoutes = require("./routes/food")
 const restaurantRoutes = require("./routes/restaurant")
 
@@ -24,12 +27,13 @@ app.options("*", cors());
 
 
 
-
 /* routes */
 
 app.get("/", (req, res) => {
     res.status(200).send("ENDPOINTS HOME")
 })
+
+
 
 const BASE_URI = process.env.BASE_URI
 
@@ -40,6 +44,11 @@ const BASE_URI = process.env.BASE_URI
 app.get(`${BASE_URI}/search`, searchController.dynamicSearch)
 app.use(`${BASE_URI}/foods/`, foodRoutes)
 app.use(`${BASE_URI}/restaurants/`, restaurantRoutes)
+app.use(`${BASE_URI}/account`, authAccountRoutes);
+app.use(`${BASE_URI}/users`, userRoutes);
+
+// Handle errors.
+app.use(errorHandler);
 
 
 const PORT = process.env.PORT
