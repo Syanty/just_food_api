@@ -29,9 +29,14 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  email_verified: {
-    type: Boolean,
-    default: false,
+  confirmationCode: {
+    type: String,
+    unique: true
+  },
+  status: {
+    type: String, 
+    enum: ['Pending', 'Active',"Restricted"],
+    default: 'Pending'
   },
   date_created: { type: Date, default: Date.now }
 });

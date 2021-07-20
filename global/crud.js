@@ -7,7 +7,7 @@ module.exports = (Collection) => {
   // ======
   const create = (req, res) => {
     const newEntry = req.body;
-    new Collection(newEntry).save((e, newEntry) => {
+    Collection.create(newEntry, (e, newEntry) => {
       if (e) {
         res.sendStatus(500);
       } else {
@@ -61,7 +61,7 @@ module.exports = (Collection) => {
   // Remove
   // ======
   const remove = (req, res) => {
-    Collection.findByIdAndRemove( req.params._id, (e) => {
+    Collection.findByIdAndRemove(req.params._id, (e) => {
       if (e)
         res.status(500).send(e);
       else

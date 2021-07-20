@@ -1,6 +1,7 @@
 const JWTstrategy = require("passport-jwt").Strategy;
 const ExtractJWT = require("passport-jwt").ExtractJwt;
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 const localStrategy = require("passport-local").Strategy;
 const User = require("../models/user");
 
@@ -18,11 +19,13 @@ passport.use(
                 if (userExist) {
                     return done(null, false, { message: "Email is already taken.", statusCode: 400 });
                 }
-
-
+                const token = jwt.sign({ email: email }, process.env.SECRET, {
+                    expiresIn: "1h",
+                });
                 const user = await User.create({
                     email,
                     password,
+                    confirmationCode: token
                 });
 
                 return done(null, user, { message: "Verification link has been sent to the email. Please Verify it before logging in." });
@@ -47,11 +50,12 @@ passport.use(
                 if (!user) {
                     return done(null, false, { message: "Email is not registered", statusCode: 404 });
                 }
-
-                if (!user.email_verified) {
-                    return done(null, false, { message: "Please verify your email", statusCode: 400 });
+                if (user.status != "Active") {
+                    return done(null,false,{
+                        message: "Pending Account. Please Verify Your Email!",
+                        statusCode:400
+                    });
                 }
-
                 const isValid = await user.isValidPassword(password);
                 if (!isValid) {
                     return done(null, false, { message: "Password Incorrect", statusCode: 400 });
