@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("../config/nodemailer")
 const User = require("../models/user");
 
-router.post("/signup/", async (req, res, next) => {
+router.post("/user/signup/", async (req, res, next) => {
   passport.authenticate("signup", async (err, user, info) => {
     if (err) {
       return next(err);
@@ -27,7 +27,7 @@ router.post("/signup/", async (req, res, next) => {
 });
 
 
-router.get("/verify/:confirmationCode/", async (req, res) => {
+router.get("/user/verify/:confirmationCode/", async (req, res) => {
   const token_status = verifyToken(req.params.confirmationCode, res)
   if (token_status) {
     User.findOne({
@@ -58,7 +58,7 @@ router.get("/verify/:confirmationCode/", async (req, res) => {
 
 })
 
-router.get("/resend/:email/confirmation-link/", async (req, res) => {
+router.get("/user/:email/resend/confirmation-link/", async (req, res) => {
 
   const email = req.params.email
   User.findOne({ email: email }).then(user => {
@@ -68,10 +68,17 @@ router.get("/resend/:email/confirmation-link/", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.SECRET, {
         expiresIn: "1h",
       });
-      res.status(200).send({
-        message: "Verification link has been sent to your email",
-      });
 
+      user.confirmationCode = token
+      user.save((err) => {
+        if (err) {
+          res.status(500).send({ message: err });
+          return;
+        }
+        res.status(200).send({
+          message: "Verification link has been sent to your email",
+        });
+      });
       nodemailer.sendConfirmationEmail(
         user.email,
         user.confirmationCode
@@ -87,7 +94,7 @@ router.get("/resend/:email/confirmation-link/", async (req, res) => {
   })
 })
 
-router.post("/login/", async (req, res, next) => {
+router.post("/user/login/", async (req, res, next) => {
   passport.authenticate("login", async (err, user, info) => {
     try {
       if (err) {
@@ -140,7 +147,7 @@ router.get(
   }
 );
 
-router.get("/logout/", (req, res) => {
+router.get("/user/logout/", (req, res) => {
   req.logout();
 });
 

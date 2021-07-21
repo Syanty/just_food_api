@@ -27,9 +27,10 @@ passport.use(
                     password,
                     confirmationCode: token
                 });
-
+               
                 return done(null, user, { message: "Verification link has been sent to the email. Please Verify it before logging in." });
             } catch (error) {
+                console.log(error)
                 done(error);
             }
 

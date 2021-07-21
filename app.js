@@ -44,7 +44,7 @@ const BASE_URI = process.env.BASE_URI
 app.get(`${BASE_URI}/search`, searchController.dynamicSearch)
 app.use(`${BASE_URI}/foods/`, foodRoutes)
 app.use(`${BASE_URI}/restaurants/`, restaurantRoutes)
-app.use(`${BASE_URI}/account`, authAccountRoutes);
+app.use(`${BASE_URI}/auth`, authAccountRoutes);
 app.use(`${BASE_URI}/users`, userRoutes);
 
 // Handle errors.
