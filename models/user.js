@@ -2,10 +2,27 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const UserSchema = new mongoose.Schema({
+  first_name: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return v.length <= 15;
+      },
+      message: `Firstname should be of atmost 15 character`
+    }
+  },
+  last_name: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return v.length <= 15;
+      },
+      message: `Lastname should be of atmost 15 character`
+    }
+  },
   email: {
     type: String,
     unique: true,
-    required: [true, "Email is required"],
     validate: {
       validator: function (v) {
         const re =
@@ -17,7 +34,6 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "Password is required"],
     validate: {
       validator: function (v) {
         return v.length >= 8;
@@ -35,8 +51,26 @@ const UserSchema = new mongoose.Schema({
   },
   status: {
     type: String, 
-    enum: ['Pending', 'Active',"Restricted"],
+    enum: ['Pending', 'Active'],
     default: 'Pending'
+  },
+  phone: {
+    type: Number,
+    validate: {
+      validator: function (v) {
+        return /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+  },
+  phoneConfirmed:{
+    type: String, 
+    enum: ['Pending', 'Confirmed'],
+    default: 'Pending'
+  },
+  resetPasswordCode: {
+    type: String,
+    unique: true
   },
   date_created: { type: Date, default: Date.now }
 });

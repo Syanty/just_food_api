@@ -12,8 +12,9 @@ passport.use(
             usernameField: "email",
             passwordField: "password",
             session: false,
+            passReqToCallback:true
         },
-        async (email, password, done) => {
+        async (req,email, password, done) => {
             try {
                 const userExist = await User.findOne({ email: email })
                 if (userExist) {
@@ -23,14 +24,17 @@ passport.use(
                     expiresIn: "1h",
                 });
                 const user = await User.create({
+                    first_name:req.body.first_name,
+                    last_name:req.body.last_name,
                     email,
                     password,
-                    confirmationCode: token
+                    confirmationCode: token,
+                    phone:req.body.phone,
+                    isAdmin:req.body.isAdmin
                 });
                
                 return done(null, user, { message: "Verification link has been sent to the email. Please Verify it before logging in." });
             } catch (error) {
-                console.log(error)
                 done(error);
             }
 
