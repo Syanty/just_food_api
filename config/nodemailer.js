@@ -21,7 +21,7 @@ module.exports.sendConfirmationEmail = (email, confirmationCode) => {
         html: `<h1>Email Confirmation</h1>
           <h2>Hello ${email}</h2>
           <p>Thank you for joining. Please confirm your email by clicking on the following link</p>
-          <a href=${HOST_URL}/account/confirm/${confirmationCode}> Click here</a>
+          <a target="_blank" href=${HOST_URL}/account/confirm/${confirmationCode}> Click here</a>
           <p>If you didn't sign up for this, just ignore this email.</p>`,
     }).catch(err => console.log(err));
 };
@@ -34,7 +34,7 @@ module.exports.sendResetPasswordEmail = (email, resetCode) => {
         html: `<h1>Reset Password</h1>
           <h2>Hello ${email}</h2>
           <p>A request has been received to change password for your Just Food account</p>
-          <a href=${HOST_URL}/account/reset-password/${resetCode}> Reset Password</a>
+          <a target="_blank" href=${HOST_URL}/account/reset-password/${resetCode}> Reset Password</a>
           <p>If you didn't initiate this request, please contact us immediately at <a href = "mailto: justfood.nepal@gmail.com">justfood.nepal@gmail.com</a> </p>`,
     }).catch(err => console.log(err));
 };

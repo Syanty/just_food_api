@@ -184,7 +184,7 @@ router.get("/user/forgot-password/:email/reset-password", (req, res, done) => {
   })
 })
 
-router.post("/user/reset-password/:resetCode", (req, res, done) => {
+router.get("/user/reset-password/:resetCode", (req, res, done) => {
   const resetCode = req.params.resetCode
   const token_status = verifyToken(resetCode, res)
   if (token_status) {
@@ -196,28 +196,47 @@ router.post("/user/reset-password/:resetCode", (req, res, done) => {
           return res.status(404).send({ message: "User Not found." });
         }
 
-        const password = req.body.password
-        const confirm_password = req.body.confirm_password
-
-        if (password != confirm_password) {
-          return res.status(400).send({
-            message: "Password donot match"
-          })
-        }
-
-        user.password = password;
-        user.save((err) => {
-          if (err) {
-            done(err)
-            return;
-          }
-          res.status(200).send({ message: "Password reset successful" })
-        });
+        return res.status(200).send(user.email)
 
       })
       .catch((e) => done(e));
 
   }
+})
+router.post("/user/reset-password/:resetCode", (req, res, done) => {
+  const resetCode = req.params.resetCode
+  User.findOne({
+    resetPasswordCode: resetCode,
+  })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: "User Not found." });
+      }
+
+      const password = req.body.password
+      const confirm_password = req.body.confirm_password
+
+
+      if (password != confirm_password) {
+        return res.status(400).send({
+          message: "Password donot match"
+        })
+      }
+
+      user.password = password;
+      user.save((err) => {
+        if (err) {
+          done(err)
+          return;
+        }
+        res.status(200).send({ message: "Password reset successful" })
+      });
+
+    })
+    .catch((e) => done(e));
+
+
+
 })
 
 module.exports = router;
